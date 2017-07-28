@@ -1,10 +1,22 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pff)
 
+# this line enforces the ansi c11 standard
+if(NOT WIN32)
+  add_definitions(-std=c++11)
+  add_compile_options("-Wall" "-Wextra" "-Wno-deprecated-declarations")
+endif()
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  geometry_msgs
+  sensor_msgs
+  std_msgs
+  tf
   urdf
 )
 
@@ -110,32 +122,40 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  include
 )
 
 ## Declare a C++ library
-# add_library(pff
-#   src/${PROJECT_NAME}/pff.cpp
-# )
+#  add_library(pff
+#    src/${PROJECT_NAME}/pff.cpp
+#  )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(pff ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#  add_dependencies(pff_state_publisher
+#    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+#    ${catkin_EXPORTED_TARGETS}
+#  )
 
 ## Declare a C++ executable
-# add_executable(pff_node src/pff_node.cpp)
+add_executable(pff_state_publisher
+  src/pff_state_publisher.cpp
+)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(pff_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(pff_state_publisher
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(pff_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(pff_state_publisher
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -152,11 +172,11 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS pff pff_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS pff_state_publisher
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
@@ -171,6 +191,9 @@ include_directories(
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+install(DIRECTORY launch urdf
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##
