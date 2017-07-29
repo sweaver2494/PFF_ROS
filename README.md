@@ -3,15 +3,15 @@
 ## About
 This repository contains the following:
 * a simple urdf differential drive model
-* a robot state publisher node that broadcasts tf transformations from the map to the robot
+* a custom robot state publisher node that subscribes to the joint_states topic and publishes to the tf topic. This node broadcasts tf transformations from the map to the robot's central axle.
 * a launch file to launch the following:
   * joint state publisher GUI
-  * robot state publisher (for the wheel joints)
-  * custom robot state publisher (transform the map to the robot)
-  * rvis
+  * robot state publisher (to publish transformations from the central axle to the wheels)
+  * custom robot state publisher (to publish transformations from the map to the robot's central axle)
+  * rvis to visualize the robot's motion
 
 ## Run Instructions
-From this directory, type:
+From this README's directory, type:
 ```
 source /opt/ros/kinetic/setup.bash
 roscore& 
