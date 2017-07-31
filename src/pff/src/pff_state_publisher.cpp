@@ -14,14 +14,11 @@ struct Robot
 {
   double wheel_radius;
   double axle_length;
-  double period; // seconds
+  double period;        // seconds
 
   int right_wheel_angle;// radians
   int left_wheel_angle; // radians
-
-  int x_position;
-  int y_position;
-  int orientation; // radians
+  int orientation;      // radians
 
   Robot(double w, double l, double p) :
     wheel_radius(w),
@@ -31,6 +28,7 @@ struct Robot
 
 } state(1.0, 0.8, 1.0);
 
+// Use smart pointer because TransformBroadcaster initialization requires ros nodeHandle.
 std::unique_ptr<tf::TransformBroadcaster> broadcaster;
 
 void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
@@ -38,8 +36,9 @@ void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
   ROS_INFO_STREAM("Received Joint State");
   
   // Calculate angular velocity of wheels
-  double new_right_wheel_angle = msg->position[0] / 8; // divide by 8 is cheating to avoid angle issues
-  double new_left_wheel_angle = msg->position[1] / 8; // divide by 8 is cheating to avoid angle issues
+  // Divide angles by 8 is a hack to avoid angle normalization because input is limited to range [-2pi, 2pi].
+  double new_right_wheel_angle = msg->position[0] / 8;
+  double new_left_wheel_angle = msg->position[1] / 8;
   double u_right_wheel = (new_right_wheel_angle - state.right_wheel_angle) / state.period;
   double u_left_wheel = (new_left_wheel_angle - state.left_wheel_angle) / state.period;
 
@@ -54,8 +53,6 @@ void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
   // Update state
   state.right_wheel_angle = new_right_wheel_angle;
   state.left_wheel_angle = new_left_wheel_angle;
-  state.x_position += v_x;
-  state.y_position += v_y;
   state.orientation += v_angle;
 
   // Update and Send TF Transform
